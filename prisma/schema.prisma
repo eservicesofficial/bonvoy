@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Central user profile — the single source of truth for every screen.
+model Profile {
+  id             String   @id @default("singleton")
+  firstName      String   @default("Angel")
+  lastName       String   @default("Priya")
+  memberNumber   String   @default("060575526")
+  memberLevel    String   @default("Titanium Elite")
+  nights         Int      @default(323) // "Nights This Year" on the membership dashboard arc
+  lifetimeNights Int      @default(3) // greeting bar "N Nights" + Lifetime Progress row
+  spend          Float    @default(12339) // Annual Qualifying Spend (USD)
+  points         Int      @default(2212) // Points Balance
+  expiryDate     String   @default("Nov 22, 2028") // membership / points expiry date
+  memberSince    String   @default("2026") // e.g. "Titanium Since 2026"
+  updatedAt      DateTime @updatedAt
+}
+
+// Admin credentials — scrypt hash only, never plain text.
+model AdminAuth {
+  id           String   @id @default("singleton")
+  passwordHash String // format: scrypt$<saltHex>$<hashHex>
+  updatedAt    DateTime @updatedAt
+}
+
+model AdminSession {
+  token     String   @id
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+// Exact wallet-QR JSON payload (stored verbatim, encoded into the QR as-is).
+model QrData {
+  id        String   @id @default("singleton")
+  data      String
+  updatedAt DateTime @updatedAt
+}
